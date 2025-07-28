@@ -3,10 +3,15 @@ import calendar
 from calendar import HTMLCalendar
 from datetime import datetime
 
-def home(request, year, month):
+def home(request, year=datetime.now().year, month=datetime.now().strftime('%b')):
     name = "Ivan"
     month = month.capitalize()
-    month_number = list(calendar.month_name).index(month)
+    
+    if month in calendar.month_name:
+        month_number = list(calendar.month_name).index(month)
+    elif month in calendar.month_abbr:
+        month_number = list(calendar.month_abbr).index(month)
+    #month_number = list(calendar.month_name).index(month)
     month_number = int(month_number)
 
     cal = HTMLCalendar().formatmonth(year, month_number)
@@ -17,7 +22,7 @@ def home(request, year, month):
     time = now.strftime('%I:%M %p')
 
     return render(request, 
-        'home.html', {
+        'myapp/home.html', {
         "name": name,
         "year": year,
         "month": month,

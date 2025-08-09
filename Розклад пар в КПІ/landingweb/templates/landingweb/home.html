@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розклад занять | КПІ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue: #0066cc; /* Глибокий синій */
+            --light-blue: #e6f2ff; /* Дуже світлий блакитний */
+            --dark-blue: #004080; /* Темно-синій */
+            --yellow: #FFD700;
+            --gold: #FFC107;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --red: #FF5252;
+            --white: #FFFFFF;
+            --green: #4CAF50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(to right, rgba(245, 247, 250, 0.9), rgba(245, 247, 250, 0.9)),
+                url('https://www.kpi.ua/wp-content/uploads/2021/10/kpi-campus.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--blue) 100%);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            border-bottom: 4px solid var(--gold);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .navbar::before {
+            content: "";
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FF5252, #0066cc, #4CAF50);
+            opacity: 0.8;
+        }
+        
+        .navbar-brand {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .kpi-logo {
+            height: 40px;
+            margin-right: 15px;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+        }
+        
+        .ukraine-flag {
+            height: 30px;
+            vertical-align: middle;
+            margin-left: 10px;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
+            border-radius: 2px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--blue);
+            transition: var(--transition);
+        }
+        
+        .schedule-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .week-navigation {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--blue);
+            color: var(--blue);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .schedule-card {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            border-top: 4px solid var(--blue);
+            position: relative;
+        }
+        
+        .schedule-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .day-header {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--dark-blue) 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .day-header::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+        
+        .day-date {
+            font-size: 0.9em;
+            opacity: 0.9;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .empty-day {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            background-color: var(--light);
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .lecture-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .lecture-table th {
+            background-color: var(--light-blue);
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--dark-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .lecture-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
+            vertical-align: top;
+            transition: var(--transition);
+        }
+        
+        .lecture-table tr:hover td {
+            background-color: var(--light-blue);
+        }
+        
+        .lecture-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .lecture-time {
+            white-space: nowrap;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: 100px;
+        }
+        
+        .lecture-subject {
+            font-weight: 600;
+            color: var(--dark-blue);
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        
+        .lecture-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background-color: var(--gold);
+            color: #000;
+            margin-left: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .lecture-room {
+            color: var(--dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .lecture-room i {
+            color: var(--blue);
+        }
+        
+        .lecture-teacher {
+            color: #555;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .lecture-teacher i {
+            color: var(--green);
+        }
+        
+        .current-day {
+            border-top: 4px solid var(--red);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 82, 82, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+        }
+        
+        .current-day .day-header {
+            background: linear-gradient(135deg, var(--red) 0%, #c62828 100%);
+        }
+        
+        .current-day::after {
+            content: "СЬОГОДНІ";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--red);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: bold;
+            z-index: 1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-lecture {
+            background-color: #BBE6FF;
+            color: var(--dark-blue);
+        }
+        
+        .badge-practice {
+            background-color: #D1F7C4;
+            color: #2E7D32;
+        }
+        
+        .badge-lab {
+            background-color: #FFE0B2;
+            color: #E65100;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .schedule-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .week-navigation {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn {
+                flex-grow: 1;
+                justify-content: center;
+            }
+            
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Анімація завантаження */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .schedule-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Додаємо затримку для анімації кожного дня */
+        .schedule-card:nth-child(1) { animation-delay: 0.1s; }
+        .schedule-card:nth-child(2) { animation-delay: 0.2s; }
+        .schedule-card:nth-child(3) { animation-delay: 0.3s; }
+        .schedule-card:nth-child(4) { animation-delay: 0.4s; }
+        .schedule-card:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="https://kpi.ua/wp-content/uploads/2020/02/logo_kpi.png" alt="КПІ" class="kpi-logo">
+            Розклад занять <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/1200px-Flag_of_Ukraine.svg.png" alt="Україна" class="ukraine-flag">
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="schedule-header">
+            <h2 id="week-title">Розклад на тиждень</h2>
+            <div class="week-navigation">
+                <button class="btn btn-outline" id="prev-week">
+                    <i class="fas fa-chevron-left"></i> Попередній
+                </button>
+                <button class="btn btn-outline" id="next-week">
+                    Наступний <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="schedule-grid" id="schedule-container">
+            <!-- Тут буде динамічно створюватися розклад -->
+        </div>
+        
+        <div class="footer">
+            <p>Київський політехнічний інститут імені Ігоря Сікорського © 2023</p>
+            <p>Розроблено з ❤️ для студентів КПІ</p>
+        </div>
+    </div>
+
+    <script>
+        // Дані розкладу для різних тижнів
+        const scheduleData = {
+            "2023-08-07": {
+                "Понеділок": [
+                    {
+                        time: "8:30 - 10:05",
+                        subject: "Математичний аналіз",
+                        type: "лекція",
+                        teacher: "доц. Олександр Николяк",
+                        room: "1-й корпус, ауд. 101"
+                    },
+                    {
+                        time: "10:25 - 12:00",
+                        subject: "Програмування",
+                        type: "практика",
+                        teacher: "ст. викл. Ада Лавлейс",
+                        room: "1-й корпус, ауд. 305"
+                    },
+                    {
+                        time: "12:20 - 13:55",
+                        subject: "Українська мова",
+                        type: "лекція",
+                        teacher: "доц. Ліна Костенко",
+                        room: "1-й корпус, ауд. 101"
+                    }
+                ],
+                "Вівторок": [
+                    {
+                        time: "8:30 - 10:05",
+                        subject: "Історія",
+                        type: "лекція",
+                        teacher: "викл. Ярослав Мудрий",
+                        room: "2-й корпус, ауд. 101"
+                    },
+                    {
+                        time: "12:20 - 13:55",
+                        subject: "Фізика",
+                        type: "лекція",
+                        teacher: "проф. Стів Джобс",
+                        room: "2-й корпус, ауд. 208"
+                    }
+                ],
+                "Середа": [
+                    {
+                        time: "14:15 - 15:50",
+                        subject: "Іноземна мова",
+                        type: "лекція",
+                        teacher: "викл. Анджеліна Джолі",
+                        room: "2-й корпус, ауд. 42"
+                    }
+                ],
+                "Четвер": [
+                    {
+                        time: "8:30 - 10:05",
+                        subject: "Релігієзнавство",
+                        type: "лекція",
+                        teacher: "доц. Рене Декарт",
+                        room: "3-й корпус, ауд. 101"
+                    },
+                    {
+                        time: "10:25 - 11:10",
+                        subject: "Архітектура комп'ютерів",
+                        type: "лекція",
+                        teacher: "доц. Джекі Чан",
+                        room: "3-й корпус, ауд. 203"
+                    }
+                ],
+                "П'ятниця": [
+                    {
+                        time: "10:00 - 11:35",
+                        subject: "Філософія",
+                        type: "лекція",
+                        teacher: "проф. Джим Керрі",
+                        room: "3-й корпус, ауд. 12"
+                    }
+                ]
+            },
+            "2023-08-14": {
+                "Понеділок": [
+                    {
+                        time: "9:00 - 10:35",
+                        subject: "Дискретна математика",
+                        type: "лекція",
+                        teacher: "доц. Джеймс Гослінг",
+                        room: "головний корпус, ауд. 105"
+                    }
+                ],
+                "Вівторок": [
+                    {
+                        time: "12:20 - 13:55",
+                        subject: "Українська мова",
+                        type: "практика",
+                        teacher: "доц. Ліна Костенко",
+                        room: "1-й корпус, ауд. 101"
+                    },
+                    {
+                        time: "14:15 - 15:50",
+                        subject: "Іноземна мова",
+                        type: "практика",
+                        teacher: "викл. Анджеліна Джолі",
+                        room: "1-й корпус, ауд. 42"
+                    },
+                    {
+                        time: "16:00 - 17:35",
+                        subject: "Програмування",
+                        type: "лабораторна",
+                        teacher: "ст. викл. Ада Лавлейс",
+                        room: "1-й корпус, ауд. 310"
+                    }
+                ],
+                "Середа": [
+                    {
+                        time: "10:30 - 12:05",
+                        subject: "Релігієзнавство",
+                        type: "лекція",
+                        teacher: "доц. Рене Декарт",
+                        room: "5-й корпус, ауд. 101"
+                    },
+                    {
+                        time: "14:15 - 15:50",
+                        subject: "Операційні системи",
+                        type: "лекція",
+                        teacher: "проф. Марк Цукерберг",
+                        room: "5-й корпус, ауд. 112"
+                    }
+                ],
+                "Четвер": [
+                    {
+                        time: "8:30 - 10:05",
+                        subject: "Фізика",
+                        type: "практика",
+                        teacher: "ст. викл. Стів Джобс",
+                        room: "4-й корпус, ауд. 310"
+                    }
+                ],
+                "П'ятниця": [
+                    {
+                        time: "8:30 - 10:00",
+                        subject: "Філософія",
+                        type: "лекція",
+                        teacher: "проф. Джим Керрі",
+                        room: "Головний корпус, ауд. 12"
+                    },
+                    {
+                        time: "10:35 - 11:50",
+                        subject: "Архітектура комп'ютерів",
+                        type: "лекція",
+                        teacher: "доц. Джекі Чан",
+                        room: "головний корпус, ауд. 203"
+                    },
+                    {
+                        time: "12:00 - 13:35",
+                        subject: "Фізкультура",
+                        type: "практика",
+                        teacher: "Арнольд Шварцнеггер",
+                        room: "Спортзал"
+                    }
+                ]
+            }
+        };
+
+        // Поточний тиждень
+        let currentWeekStart = "2023-08-07";
+        const daysOrder = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця"];
+
+        // Функція для форматування дати
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { day: 'numeric', month: 'long' };
+            return date.toLocaleDateString('uk-UA', options);
+        }
+
+        // Функція для отримання дат тижня
+        function getWeekDates(startDate) {
+            const date = new Date(startDate);
+            const dates = {};
+            
+            for (let i = 0; i < 5; i++) {
+                const currentDate = new Date(date);
+                currentDate.setDate(date.getDate() + i);
+                dates[daysOrder[i]] = formatDate(currentDate);
+            }
+            
+            return dates;
+        }
+
+        // Функція для отримання класу бейджа за типом заняття
+        function getBadgeClass(type) {
+            if (!type) return '';
+            
+            const typeLower = type.toLowerCase();
+            if (typeLower.includes('лекція')) return 'badge-lecture';
+            if (typeLower.includes('практика')) return 'badge-practice';
+            if (typeLower.includes('лабораторна')) return 'badge-lab';
+            return '';
+        }
+
+        // Функція для відображення розкладу
+        function renderSchedule() {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = '';
+            
+            const weekDates = getWeekDates(currentWeekStart);
+            const weekData = scheduleData[currentWeekStart];
+            
+            // Оновлення заголовка
+            document.getElementById('week-title').textContent = 
+                `Розклад на тиждень ${weekDates["Понеділок"]} - ${weekDates["П'ятниця"]}`;
+            
+            // Відображення кожного дня
+            daysOrder.forEach(day => {
+                const dayData = weekData[day];
+                const dayElement = document.createElement('div');
+                dayElement.className = 'schedule-card';
+                
+                // Перевірка чи це поточний день
+                const today = new Date();
+                const weekStart = new Date(currentWeekStart);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 5);
+                
+                if (daysOrder.indexOf(day) === today.getDay() - 1 && 
+                    today >= weekStart && 
+                    today < weekEnd) {
+                    dayElement.classList.add('current-day');
+                }
+                
+                if (!dayData || dayData.length === 0) {
+                    dayElement.innerHTML = `
+                        <div class="day-header">
+                            <span>${day}</span>
+                            <span class="day-date">${weekDates[day]}</span>
+                        </div>
+                        <div class="empty-day">Пар немає <i class="far fa-smile"></i></div>
+                    `;
+                } else {
+                    dayElement.innerHTML = `
+                        <div class="day-header">
+                            <span>${day}</span>
+                            <span class="day-date">${weekDates[day]}</span>
+                        </div>
+                        <table class="lecture-table">
+                            <tbody>
+                                ${dayData.map(lecture => `
+                                    <tr>
+                                        <td class="lecture-time">${lecture.time}</td>
+                                        <td>
+                                            <span class="lecture-subject">${lecture.subject}</span>
+                                            ${lecture.type ? `<span class="badge ${getBadgeClass(lecture.type)}">${lecture.type}</span>` : ''}
+                                            <div class="lecture-teacher"><i class="fas fa-chalkboard-teacher"></i> ${lecture.teacher}</div>
+                                        </td>
+                                        <td class="lecture-room"><i class="fas fa-map-marker-alt"></i> ${lecture.room}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+                
+                container.appendChild(dayElement);
+            });
+            
+            // Оновлення стану кнопок
+            document.getElementById('prev-week').disabled = !scheduleData[getPrevWeek()];
+            document.getElementById('next-week').disabled = !scheduleData[getNextWeek()];
+        }
+
+        // Функції для навігації по тижнях
+        function getPrevWeek() {
+            const date = new Date(currentWeekStart);
+            date.setDate(date.getDate() - 7);
+            return date.toISOString().split('T')[0];
+        }
+
+        function getNextWeek() {
+            const date = new Date(currentWeekStart);
+            date.setDate(date.getDate() + 7);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Обробники подій
+        document.getElementById('prev-week').addEventListener('click', () => {
+            const prevWeek = getPrevWeek();
+            if (scheduleData[prevWeek]) {
+                currentWeekStart = prevWeek;
+                renderSchedule();
+            }
+        });
+
+        document.getElementById('next-week').addEventListener('click', () => {
+            const nextWeek = getNextWeek();
+            if (scheduleData[nextWeek]) {
+                currentWeekStart = nextWeek;
+                renderSchedule();
+            }
+        });
+
+        // Початкове завантаження
+        document.addEventListener('DOMContentLoaded', renderSchedule);
+    </script>
+</body>
+</html>

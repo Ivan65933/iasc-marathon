@@ -30,6 +30,10 @@ pip install -r requirements.txt
 # 4. Запустіть сервер
 python manage.py migrate
 python manage.py runserver
+
+# 5. Відкрийте у браузері: 
+
+http://localhost:8000/
 ```
 
 ## Структура проекту
